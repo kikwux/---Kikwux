@@ -1,0 +1,3349 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kikwux — соцсеть с валютой</title>
+  <style>
+    /* ===== CSS Variables ===== */
+    :root {
+      --bg-primary: #f5f7fa;
+      --bg-card: #ffffff;
+      --bg-sidebar: rgba(255, 255, 255, 0.95);
+      --bg-input: #f8f9fa;
+      --text-primary: #1a1a1a;
+      --text-secondary: #6b6b6b;
+      --color-accent: #7b68ee;
+      --color-accent-hover: #6a5acd;
+      --color-border: rgba(224, 224, 224, 0.5);
+      --color-success: #2ecc71;
+      --color-danger: #e74c3c;
+      --radius-card: 16px;
+      --radius-btn: 10px;
+      --shadow-card: 0 8px 32px rgba(0,0,0,0.08);
+      --shadow-sidebar: 2px 0 32px rgba(0,0,0,0.1);
+      --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      --font-base: 16px;
+      --gradient-main: linear-gradient(135deg, #7b68ee, #9b8af7, #a78bfa, #7b68ee);
+      --gradient-sidebar: linear-gradient(180deg, rgba(123,104,238,0.03), rgba(155,138,247,0.08));
+      --gradient-card: linear-gradient(135deg, rgba(123,104,238,0.02), rgba(155,138,247,0.05));
+      --glass-bg: rgba(255, 255, 255, 0.7);
+      --glass-border: rgba(255, 255, 255, 0.2);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+      font-size: var(--font-base);
+      min-height: 100vh;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--gradient-main);
+      background-size: 300% 300%;
+      animation: gradientMove 10s ease infinite;
+      z-index: -2;
+      opacity: 0.08;
+    }
+
+    @keyframes gradientMove {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-primary); }
+    ::-webkit-scrollbar-thumb { background: var(--color-accent); border-radius: 3px; }
+
+    /* ===== AUTH PAGE ===== */
+    .auth-page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: var(--gradient-main);
+      background-size: 300% 300%;
+      animation: gradientMove 8s ease infinite;
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .auth-page::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at 30% 50%, rgba(255,255,255,0.1) 0%, transparent 50%),
+                  radial-gradient(circle at 70% 80%, rgba(255,255,255,0.08) 0%, transparent 40%);
+      animation: floatBg 15s ease-in-out infinite;
+      z-index: 0;
+    }
+
+    @keyframes floatBg {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      33% { transform: translate(5%, -5%) rotate(5deg); }
+      66% { transform: translate(-5%, 5%) rotate(-5deg); }
+    }
+
+    .auth-container {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: var(--radius-card);
+      padding: 48px 40px;
+      max-width: 420px;
+      width: 100%;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.2);
+      animation: authAppear 0.8s ease;
+      position: relative;
+      z-index: 1;
+      border: 1px solid var(--glass-border);
+    }
+
+    @keyframes authAppear {
+      from { opacity: 0; transform: translateY(30px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .auth-logo {
+      text-align: center;
+      font-size: 38px;
+      font-weight: 800;
+      background: var(--gradient-main);
+      background-size: 200% 200%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradientMove 4s ease infinite;
+      margin-bottom: 4px;
+      cursor: default;
+    }
+
+    .auth-subtitle {
+      text-align: center;
+      color: var(--text-secondary);
+      margin-bottom: 28px;
+      font-size: 14px;
+      letter-spacing: 0.5px;
+    }
+
+    .auth-form .form-group {
+      margin-bottom: 18px;
+      animation: slideUp 0.5s ease forwards;
+      opacity: 0;
+    }
+
+    .auth-form .form-group:nth-child(1) { animation-delay: 0.1s; }
+    .auth-form .form-group:nth-child(2) { animation-delay: 0.2s; }
+    .auth-form .form-group:nth-child(3) { animation-delay: 0.3s; }
+    .auth-form .form-group:nth-child(4) { animation-delay: 0.4s; }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .auth-form label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 6px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      letter-spacing: 0.3px;
+    }
+
+    .auth-form input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid var(--color-border);
+      border-radius: var(--radius-btn);
+      font-size: 15px;
+      transition: var(--transition);
+      background: var(--bg-input);
+      color: var(--text-primary);
+    }
+
+    .auth-form input:focus {
+      outline: none;
+      border-color: var(--color-accent);
+      box-shadow: 0 0 0 4px rgba(123, 104, 238, 0.1);
+      transform: translateY(-1px);
+    }
+
+    .auth-form .btn-primary {
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      margin-top: 8px;
+      position: relative;
+      overflow: hidden;
+      transition: var(--transition);
+    }
+
+    .auth-form .btn-primary::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 60%);
+      opacity: 0;
+      transition: var(--transition);
+      transform: scale(0.5);
+    }
+
+    .auth-form .btn-primary:hover::after {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .auth-switch {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .auth-switch a {
+      background: var(--gradient-main);
+      background-size: 200% 200%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-decoration: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      animation: gradientMove 3s ease infinite;
+    }
+
+    .auth-error {
+      background: rgba(231, 76, 60, 0.1);
+      color: var(--color-danger);
+      padding: 12px 16px;
+      border-radius: var(--radius-btn);
+      font-size: 14px;
+      margin-bottom: 16px;
+      display: none;
+      border-left: 4px solid var(--color-danger);
+      animation: shake 0.5s ease;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      75% { transform: translateX(10px); }
+    }
+
+    .auth-error.show { display: block; }
+
+    /* ===== PARTICLES ===== */
+    .particles {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    .particle {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: rgba(255,255,255,0.3);
+      border-radius: 50%;
+      animation: floatParticle 15s infinite linear;
+    }
+
+    .particle:nth-child(1) { left: 10%; animation-delay: 0s; animation-duration: 18s; }
+    .particle:nth-child(2) { left: 25%; animation-delay: 2s; animation-duration: 14s; width: 8px; height: 8px; }
+    .particle:nth-child(3) { left: 40%; animation-delay: 4s; animation-duration: 20s; }
+    .particle:nth-child(4) { left: 55%; animation-delay: 1s; animation-duration: 16s; width: 4px; height: 4px; }
+    .particle:nth-child(5) { left: 70%; animation-delay: 3s; animation-duration: 22s; }
+    .particle:nth-child(6) { left: 85%; animation-delay: 5s; animation-duration: 12s; width: 10px; height: 10px; opacity: 0.2; }
+    .particle:nth-child(7) { left: 15%; animation-delay: 6s; animation-duration: 19s; width: 5px; height: 5px; }
+    .particle:nth-child(8) { left: 50%; animation-delay: 3.5s; animation-duration: 17s; }
+    .particle:nth-child(9) { left: 75%; animation-delay: 2.5s; animation-duration: 21s; width: 7px; height: 7px; }
+    .particle:nth-child(10) { left: 90%; animation-delay: 4.5s; animation-duration: 13s; }
+
+    @keyframes floatParticle {
+      0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
+    }
+
+    /* ===== SIDEBAR ===== */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: -300px;
+      width: 300px;
+      height: 100vh;
+      background: var(--bg-sidebar);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: var(--shadow-sidebar);
+      z-index: 1000;
+      transition: var(--transition);
+      padding: 24px 0;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      border-right: 1px solid var(--glass-border);
+    }
+
+    .sidebar.active {
+      left: 0;
+      animation: slideIn 0.4s ease;
+    }
+
+    @keyframes slideIn {
+      from { left: -300px; opacity: 0; }
+      to { left: 0; opacity: 1; }
+    }
+
+    .sidebar-header {
+      padding: 0 24px 20px;
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .sidebar-logo {
+      font-size: 24px;
+      font-weight: 800;
+      background: var(--gradient-main);
+      background-size: 200% 200%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradientMove 4s ease infinite;
+      cursor: default;
+    }
+
+    .sidebar-close {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: var(--text-secondary);
+      padding: 4px 8px;
+      border-radius: 6px;
+      transition: var(--transition);
+    }
+
+    .sidebar-close:hover {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      transform: rotate(90deg);
+    }
+
+    .sidebar-user {
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--color-border);
+      cursor: pointer;
+      transition: var(--transition);
+      background: var(--gradient-sidebar);
+    }
+
+    .sidebar-user:hover {
+      background: var(--gradient-card);
+      transform: scale(1.02);
+    }
+
+    .sidebar-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--gradient-main);
+      background-size: 200% 200%;
+      animation: gradientMove 4s ease infinite;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 20px;
+      flex-shrink: 0;
+      transition: var(--transition);
+      box-shadow: 0 4px 15px rgba(123,104,238,0.3);
+    }
+
+    .sidebar-avatar:hover {
+      transform: scale(1.1) rotate(5deg);
+    }
+
+    .sidebar-user-info { flex: 1; }
+    .sidebar-user-name {
+      font-weight: 600;
+      font-size: 16px;
+      background: var(--gradient-main);
+      background-size: 200% 200%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradientMove 4s ease infinite;
+    }
+    .sidebar-user-email { font-size: 13px; color: var(--text-secondary); }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 16px 12px;
+    }
+
+    .sidebar-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: var(--radius-btn);
+      cursor: pointer;
+      transition: var(--transition);
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 15px;
+      margin-bottom: 4px;
+      position: relative;
+      overflow: hidden;
+      background: transparent;
+      border: none;
+      width: 100%;
+      text-align: left;
+    }
+
+    .sidebar-nav-item::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--gradient-main);
+      background-size: 200% 200%;
+      opacity: 0;
+      transition: var(--transition);
+      border-radius: var(--radius-btn);
+    }
+
+    .sidebar-nav-item:hover::before {
+      opacity: 0.08;
+      animation: gradientMove 2s ease infinite;
+    }
+
+    .sidebar-nav-item:hover {
+      color: var(--color-accent);
+      transform: translateX(5px);
+    }
+
+    .sidebar-nav-item.active {
+      background: var(--gradient-main);
+      background-size: 200% 200%;
+      animation: gradientMove 3s ease infinite;
+      color: white;
+      box-shadow: 0 4px 20px rgba(123,104,238,0.3);
+    }
+
+    .sidebar-nav-item .icon {
+      font-size: 20px;
+      width: 28px;
+      text-align: center;
+      transition: var(--transition);
+    }
+
+    .sidebar-nav-item:hover .icon {
+      transform: scale(1.2) rotate(5deg);
+    }
+
+    .sidebar-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--color-border);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .sidebar-footer .sidebar-nav-item {
+      margin-bottom: 0;
+      font-size: 14px;
+    }
+
+    /* ===== OVERLAY ===== */
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 999;
+      opacity: 0;
+      pointer-events: none;
+      transition: var(--transition);
+    }
+
+    .overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    /* ===== MAIN CONTENT ===== */
+    .main-content {
+      transition: var(--transition);
+      display: none;
+    }
+
+    .main-content.active {
+      display: block;
+      animation: fadeIn 0.6s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .container {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+
+    /* ===== HEADER ===== */
+    .header {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      padding: 12px 0;
+      border-bottom: 1px solid var(--glass-border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      transition: var(--transition);
+    }
+
+    .header:hover { background: var(--bg-card); }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .menu-btn {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      padding: 8px 10px;
+      border-radius: var(--radius-btn);
+      transition: var(--transition);
+      color: var(--text-primary);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .menu-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--gradient-main);
+      background-size: 200% 200%;
+      opacity: 0;
+      transition: var(--transition);
+      border-radius: var(--radius-btn);
+    }
+
+    .menu-btn:hover::before {
+      opacity: 0.1;
+      animation: gradientMove 2s ease infinite;
+    }
+
+    .menu-btn:hover { transform: scale(1.1); }
+
+    .logo {
+      font-size: 22px;
+      font-weight: 800;
+      background: var(--gradient-main);
+      background-size: 200% 200%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradientMove 4s ease infinite;
+      cursor: default;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .currency-display {
+      background: linear-gradient(135deg, #f7971e, #ffd200);
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-weight: 700;
+      color: #1a1a1a;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: default;
+    }
+
+    .search-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-input);
+      border-radius: var(--radius-btn);
+      padding: 4px 12px;
+      border: 2px solid var(--color-border);
+      transition: var(--transition);
+    }
+
+    .search-container:focus-within {
+      border-color: var(--color-accent);
+      box-shadow: 0 0 0 4px rgba(123,104,238,0.1);
+    }
+
+    .search-container input {
+      border: none;
+      background: transparent;
+      padding: 8px 0;
+      font-size: 14px;
+      outline: none;
+      color: var(--text-primary);
+      width: 120px;
+    }
+
+    .search-container button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+      padding: 4px;
+      color: var(--text-secondary);
+      transition: var(--transition);
+    }
+
+    .search-container button:hover { color: var(--color-accent); }
+
+    .header-btn {
+      padding: 6px 12px;
+      border: 2px solid var(--color-border);
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      border-radius: var(--radius-btn);
+      cursor: pointer;
+      font-size: 14px;
+      transition: var(--transition);
+      white-space: nowrap;
+      color: var(--text-primary);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--gradient-main);
+      background-size: 200% 200%;
+      opacity: 0;
+      transition: var(--transition);
+      border-radius: var(--radius-btn);
+    }
+
+    .header-btn:hover::before {
+      opacity: 0.1;
+      animation: gradientMove 2s ease infinite;
+    }
+
+    .header-btn:hover {
+      border-color: var(--color-accent);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 20px rgba(123,104,238,0.15);
+    }
+
+    .header-btn.logout-btn {
+      color: var(--color-danger);
+      border-color: var(--color-danger);
+    }
+
+    .header-btn.logout-btn:hover {
+      background: var(--color-danger);
+      color: white;
+      border-color: var(--color-danger);
+    }
+
+    .header-btn.admin-btn {
+      background: linear-gradient(135deg, #e74c3c, #c0392b);
+      color: white;
+      border-color: #e74c3c;
+    }
+
+    /* ===== POST FORM ===== */
+    .post-form {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: var(--radius-card);
+      padding: 24px;
+      margin-top: 16px;
+      box-shadow: var(--shadow-card);
+      border: 1px solid var(--glass-border);
+      transition: var(--transition);
+    }
+
+    .post-form:hover {
+      box-shadow: 0 12px 48px rgba(123,104,238,0.1);
+      transform: translateY(-2px);
+    }
+
+    .post-form textarea {
+      width: 100%;
+      min-height: 80px;
+      border: 2px solid var(--color-border);
+      padding: 14px;
+      border-radius: 12px;
+      resize: vertical;
+      outline: none;
+      font-family: inherit;
+      font-size: 15px;
+      transition: var(--transition);
+      background: var(--bg-input);
+      color: var(--text-primary);
+    }
+
+    .post-form textarea:focus {
+      border-color: var(--color-accent);
+      box-shadow: 0 0 0 4px rgba(123, 104, 238, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .post-form-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 14px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .post-form-stats {
+      font-size: 13px;
+      color: var(--text-secondary);
+      transition: var(--transition);
+    }
+
+    .post-form-stats.warning {
+      color: var(--color-danger);
+      animation: pulse 1s ease infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .btn-primary {
+      padding: 10px 28px;
+      background: var(--gradient-main);
+      background-size: 200% 200%;
+      animation: gradientMove 3s ease infinite;
+      color: white;
+      border: none;
+      border-radius: var(--radius-btn);
+      cursor: pointer;
+      font-size: 15px;
+      transition: var(--transition);
+      font-weight: 600;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 60%);
+      opacity: 0;
+      transition: var(--transition);
+      transform: scale(0.5);
+    }
+
+    .btn-primary:hover::before {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 30px rgba(123,104,238,0.3);
+    }
+
+    .btn-primary:active { transform: translateY(0); }
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+      animation: none;
+    }
+
+    /* ===== FEED ===== */
+    .feed { margin-top: 20px; padding-bottom: 80px; }
+
+    /* ===== POST ===== */
+    .post {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: var(--radius-card);
+      padding: 24px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow-card);
+      animation: postAppear 0.6s ease;
+      transition: var(--transition);
+      border: 1px solid var(--glass-border);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .post::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: var(--gradient-main);
+      background-size: 200% 200%;
+      animation: gradientMove 3s ease infinite;
+      opacity: 0;
+      transition: var(--transition);
+    }
+
+    .post:hover::before { opacity: 1; }
+    .post:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 48px rgba(123,104,238,0.1);
+    }
+
+    @keyframes postAppear {
+      from { opacity: 0; transform: translateY(30px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .post-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 12px;
+      cursor: pointer;
+    }
+
+    .post-header:hover .post-author {
+      color: var(--color-accent);
+    }
+
+    .post-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--gradient-main);
+      background-size: 200% 200%;
+      animation: gradientMove 4s ease infinite;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 18px;
+      flex-shrink: 0;
+      transition: var(--transition);
+      box-shadow: 0 4px 15px rgba(123,104,238,0.2);
+    }
+
+    .post-avatar:hover {
+      transform: scale(1.1) rotate(10deg);
+    }
+
+    .post-meta { flex: 1; }
+    .post-author {
+      font-weight: 600;
+      font-size: 15px;
+      transition: var(--transition);
+    }
+    .post-author .username {
+      color: var(--text-secondary);
+      font-weight: 400;
+      font-size: 13px;
+    }
+    .post-time { color: var(--text-secondary); font-size: 13px; }
+
+    .post-text {
+      margin-bottom: 14px;
+      word-wrap: break-word;
+      font-size: 15px;
+      line-height: 1.8;
+    }
+
+    .post-actions {
+      display: flex;
+      gap: 16px;
+      font-size: 14px;
+      color: var(--text-secondary);
+      padding-top: 14px;
+      border-top: 1px solid var(--color-border);
+      flex-wrap: wrap;
+    }
+
+    .action-btn {
+      cursor: pointer;
+      transition: var(--transition);
+      user-select: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      background: none;
+      border: none;
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .action-btn:hover {
+      color: var(--color-accent);
+      background: rgba(123,104,238,0.05);
+      transform: scale(1.05);
+    }
+
+    .action-btn.liked { color: var(--color-danger); }
+    .action-btn .count { font-size: 13px; }
+
+    /* ===== КОММЕНТАРИИ ===== */
+    .comments-section {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--color-border);
+    }
+
+    .comment {
+      display: flex;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--color-border);
+      align-items: flex-start;
+    }
+
+    .comment:last-child { border-bottom: none; }
+
+    .comment-avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--gradient-main);
+      background-size: 200% 200%;
+      animation: gradientMove 3s ease infinite;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 12px;
+      flex-shrink: 0;
+    }
+
+    .comment-content { flex: 1; }
+    .comment-author {
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .comment-author:hover { color: var(--color-accent); }
+    .comment-text { font-size: 14px; }
+    .comment-time { font-size: 11px; color: var(--text-secondary); }
+
+    .comment-form {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .comment-form input {
+      flex: 1;
+      padding: 8px 12px;
+      border: 2px solid var(--color-border);
+      border-radius: var(--radius-btn);
+      font-size: 14px;
+      outline: none;
+      background: var(--bg-input);
+      color: var(--text-primary);
+      transition: var(--transition);
+    }
+
+    .comment-form input:focus {
+      border-color: var(--color-accent);
+      box-shadow: 0 0 0 4px rgba(123,104,238,0.1);
+    }
+
+    .comment-form button {
+      padding: 8px 16px;
+      background: var(--gradient-main);
+      background-size: 200% 200%;
+      animation: gradientMove 3s ease infinite;
+      color: white;
+      border: none;
+      border-radius: var(--radius-btn);
+      cursor: pointer;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+
+    .comment-form button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(123,104,238,0.3);
+    }
+
+    .toggle-comments-btn {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 14px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      transition: var(--transition);
+    }
+
+    .toggle-comments-btn:hover {
+      background: rgba(123,104,238,0.05);
+      color: var(--color-accent);
+    }
+
+    /* ===== MODAL ===== */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      animation: modalFade 0.3s ease;
+    }
+
+    @keyframes modalFade {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .modal.active { display: flex; }
+
+    .modal-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      cursor: pointer;
+    }
+
+    .modal-content {
+      position: relative;
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: var(--radius-card);
+      padding: 32px;
+      max-width: 500px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+      animation: modalSlide 0.4s ease;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.2);
+      border: 1px solid var(--glass-border);
+      z-index: 1;
+    }
+
+    @keyframes modalSlide {
+      from { opacity: 0; transform: translateY(30px) scale(0.9); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .modal-title {
+      font-size: 22px;
+      font-weight: 700;
+      background: var(--gradient-main);
+      background-size: 200% 200%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradientMove 4s ease infinite;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 28px;
+      cursor: pointer;
+      color: var(--text-secondary);
+      padding: 0 8px;
+      border-radius: 6px;
+      transition: var(--transition);
+    }
+
+    .modal-close:hover {
+      color: var(--text-primary);
+      transform: rotate(90deg);
+      background: var(--bg-primary);
+    }
+
+    /* ===== PROFILE CARD ===== */
+    .profile-card {
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    .profile-avatar-large {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: var(--gradient-main);
+      background-size: 200% 200%;
+      animation: gradientMove 4s ease infinite;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 48px;
+      margin: 0 auto 16px;
+      transition: var(--transition);
+      box-shadow: 0 8px 40px rgba(123,104,238,0.3);
+    }
+
+    .profile-avatar-large:hover {
+      transform: scale(1.05) rotate(5deg);
+    }
+
+    .profile-name {
+      font-size: 26px;
+      font-weight: 700;
+      background: var(--gradient-main);
+      background-size: 200% 200%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradientMove 4s ease infinite;
+    }
+
+    .profile-username {
+      color: var(--text-secondary);
+      font-size: 16px;
+      margin-top: 4px;
+    }
+
+    .profile-email { color: var(--text-secondary); font-size: 14px; margin-top: 2px; }
+    .profile-bio {
+      margin: 12px 0 20px;
+      color: var(--text-secondary);
+      font-size: 14px;
+      padding: 12px;
+      background: var(--gradient-card);
+      border-radius: var(--radius-btn);
+      border: 1px solid var(--color-border);
+    }
+
+    .profile-stats {
+      display: flex;
+      justify-content: center;
+      gap: 25px;
+      margin: 20px 0;
+      padding: 20px 0;
+      border-top: 1px solid var(--color-border);
+      border-bottom: 1px solid var(--color-border);
+      flex-wrap: wrap;
+    }
+
+    .profile-stat { text-align: center; transition: var(--transition); cursor: default; }
+    .profile-stat:hover { transform: scale(1.1); }
+
+    .profile-stat-number {
+      font-size: 22px;
+      font-weight: 700;
+      display: block;
+      background: var(--gradient-main);
+      background-size: 200% 200%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradientMove 4s ease infinite;
+    }
+
+    .profile-stat-label { font-size: 13px; color: var(--text-secondary); }
+
+    .profile-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+
+    .profile-actions .btn-primary { padding: 10px 24px; }
+
+    /* ===== SEARCH RESULTS ===== */
+    .search-results {
+      margin-top: 16px;
+    }
+
+    .search-result-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border-bottom: 1px solid var(--color-border);
+      cursor: pointer;
+      transition: var(--transition);
+      border-radius: 8px;
+    }
+
+    .search-result-item:hover {
+      background: var(--gradient-card);
+      transform: translateX(5px);
+    }
+
+    .search-result-item .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--gradient-main);
+      background-size: 200% 200%;
+      animation: gradientMove 3s ease infinite;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 16px;
+    }
+
+    .search-result-item .info { flex: 1; }
+    .search-result-item .name { font-weight: 600; }
+    .search-result-item .username { font-size: 13px; color: var(--text-secondary); }
+    .search-result-item .email { font-size: 13px; color: var(--text-secondary); }
+
+    .search-result-item .badge {
+      font-size: 12px;
+      padding: 2px 10px;
+      border-radius: 12px;
+      background: var(--color-accent);
+      color: white;
+    }
+
+    .search-result-item .badge.online {
+      background: var(--color-success);
+    }
+
+    .search-result-item .follow-btn {
+      padding: 4px 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      background: var(--color-accent);
+      color: white;
+      transition: all 0.3s;
+    }
+
+    .search-result-item .follow-btn:hover {
+      transform: scale(1.05);
+    }
+
+    .search-result-item .follow-btn.unfollow {
+      background: var(--color-border);
+      color: var(--text-secondary);
+    }
+
+    /* ===== GAMES ===== */
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px;
+      margin: 12px 0;
+    }
+
+    .game-card {
+      background: var(--bg-card);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      transition: all 0.3s;
+      cursor: pointer;
+      border: 2px solid transparent;
+    }
+
+    .game-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      border-color: var(--color-accent);
+    }
+
+    .game-card .emoji { font-size: 32px; display: block; margin-bottom: 4px; }
+    .game-card .name { font-weight: 700; font-size: 14px; }
+    .game-card .reward { font-size: 13px; color: #666; }
+    .game-card .cooldown { font-size: 12px; color: #999; margin-top: 4px; }
+    .game-card.locked { opacity: 0.5; cursor: not-allowed; }
+
+    /* ===== ADMIN ===== */
+    .admin-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 12px;
+      margin: 12px 0;
+    }
+
+    .admin-stat {
+      background: var(--bg-card);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    .admin-stat .number {
+      font-size: 28px;
+      font-weight: 700;
+      background: var(--gradient-main);
+      background-size: 200% 200%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradientMove 3s ease infinite;
+    }
+
+    .admin-stat .label { font-size: 13px; color: #666; }
+
+    .admin-user-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--color-border);
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .admin-user-item button {
+      padding: 4px 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      transition: all 0.3s;
+    }
+
+    .admin-user-item button:hover { transform: scale(1.05); }
+    .btn-ban { background: #e74c3c; color: white; }
+    .btn-unban { background: #2ecc71; color: white; }
+    .btn-currency { background: #f39c12; color: white; }
+    .btn-admin { background: #7b68ee; color: white; }
+    .btn-verify { background: #3498db; color: white; }
+
+    .admin-give-form {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 12px 0;
+    }
+
+    .admin-give-form input {
+      flex: 1;
+      padding: 8px 14px;
+      border: 2px solid var(--color-border);
+      border-radius: var(--radius-btn);
+      font-size: 14px;
+      outline: none;
+      background: var(--bg-input);
+      color: var(--text-primary);
+      min-width: 100px;
+    }
+
+    .admin-give-form input:focus { border-color: var(--color-accent); }
+
+    /* ===== VERIFICATION ===== */
+    .verify-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--color-border);
+      flex-wrap: wrap;
+    }
+
+    .verify-item .icon { font-size: 24px; }
+    .verify-item input {
+      flex: 1;
+      padding: 6px 12px;
+      border: 2px solid var(--color-border);
+      border-radius: 6px;
+      font-size: 14px;
+      outline: none;
+      min-width: 120px;
+      background: var(--bg-input);
+      color: var(--text-primary);
+    }
+
+    .verify-item input:focus { border-color: var(--color-accent); }
+    .verify-item .status { font-size: 18px; }
+
+    /* ===== FAMILY ===== */
+    .family-member {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .family-member .role {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-left: 8px;
+    }
+
+    .family-member button {
+      background: none;
+      border: none;
+      color: var(--color-danger);
+      cursor: pointer;
+      font-size: 18px;
+    }
+
+    .family-tree {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 12px;
+      background: var(--gradient-card);
+      border-radius: var(--radius-card);
+      border: 1px solid var(--color-border);
+    }
+
+    .family-tree .level {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .family-tree .member {
+      padding: 8px 16px;
+      background: var(--bg-card);
+      border-radius: var(--radius-btn);
+      border: 1px solid var(--color-border);
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: default;
+    }
+
+    .family-tree .member .emoji { font-size: 20px; }
+    .family-tree .member .name { font-weight: 600; }
+
+    /* ===== BADGES ===== */
+    .badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-left: 6px;
+    }
+    .badge-admin { background: #e74c3c; color: white; }
+    .badge-verified { background: #2ecc71; color: white; }
+    .badge-family { background: #3498db; color: white; }
+    .badge-banned { background: #e74c3c; color: white; }
+
+    .admin-only { display: none; }
+    .admin-only.visible { display: block; }
+
+    /* ===== NOTIFICATION ===== */
+    .notification {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1a1a1a;
+      color: white;
+      padding: 14px 28px;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+      z-index: 3000;
+      animation: slideUp 0.4s ease;
+      max-width: 90%;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .notification.success { background: #2ecc71; }
+    .notification.error { background: #e74c3c; }
+    .notification.warning { background: #f39c12; }
+
+    @keyframes slideUp {
+      from { transform: translateX(-50%) translateY(20px); opacity: 0; }
+      to { transform: translateX(-50%) translateY(0); opacity: 1; }
+    }
+
+    /* ===== SETTINGS ===== */
+    .settings-group { margin-bottom: 28px; }
+    .settings-group-label {
+      font-weight: 600;
+      margin-bottom: 14px;
+      display: block;
+      font-size: 13px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      background: var(--gradient-main);
+      background-size: 200% 200%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradientMove 4s ease infinite;
+    }
+
+    .settings-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--color-border);
+      transition: var(--transition);
+    }
+
+    .settings-item:hover {
+      padding-left: 8px;
+      background: var(--gradient-card);
+      border-radius: var(--radius-btn);
+    }
+
+    .settings-item:last-child { border-bottom: none; }
+    .settings-item-label { font-size: 15px; font-weight: 500; }
+    .settings-item-desc { font-size: 13px; color: var(--text-secondary); }
+
+    .settings-item input[type="text"],
+    .settings-item input[type="email"] {
+      padding: 8px 14px;
+      border: 2px solid var(--color-border);
+      border-radius: var(--radius-btn);
+      font-size: 14px;
+      transition: var(--transition);
+      background: var(--bg-input);
+      color: var(--text-primary);
+      width: 150px;
+    }
+
+    .settings-item input:focus {
+      border-color: var(--color-accent);
+      box-shadow: 0 0 0 4px rgba(123,104,238,0.1);
+      outline: none;
+    }
+
+    /* ===== TOGGLE ===== */
+    .toggle {
+      position: relative;
+      width: 50px;
+      height: 28px;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    .toggle input { opacity: 0; width: 0; height: 0; }
+
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #ccc;
+      border-radius: 28px;
+      transition: var(--transition);
+    }
+
+    .toggle-slider:before {
+      content: "";
+      position: absolute;
+      height: 22px;
+      width: 22px;
+      left: 3px;
+      bottom: 3px;
+      background: white;
+      border-radius: 50%;
+      transition: var(--transition);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    .toggle input:checked + .toggle-slider {
+      background: var(--gradient-main);
+      background-size: 200% 200%;
+      animation: gradientMove 2s ease infinite;
+    }
+
+    .toggle input:checked + .toggle-slider:before { transform: translateX(22px); }
+
+    .settings-select {
+      padding: 8px 14px;
+      border: 2px solid var(--color-border);
+      border-radius: var(--radius-btn);
+      background: var(--bg-input);
+      font-size: 14px;
+      cursor: pointer;
+      outline: none;
+      transition: var(--transition);
+      color: var(--text-primary);
+    }
+
+    .settings-select:focus { border-color: var(--color-accent); }
+
+    .settings-color-options { display: flex; gap: 10px; }
+
+    .color-option {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 3px solid transparent;
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+    }
+
+    .color-option:hover { transform: scale(1.15); }
+
+    .color-option.active {
+      border-color: var(--text-primary);
+      box-shadow: 0 0 0 3px white, 0 0 0 5px var(--text-primary);
+      transform: scale(1.1);
+    }
+
+    .btn-danger {
+      padding: 8px 20px;
+      background: linear-gradient(135deg, #e74c3c, #c0392b);
+      color: white;
+      border: none;
+      border-radius: var(--radius-btn);
+      cursor: pointer;
+      transition: var(--transition);
+      font-weight: 600;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-danger::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 60%);
+      opacity: 0;
+      transition: var(--transition);
+      transform: scale(0.5);
+    }
+
+    .btn-danger:hover::after {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .btn-danger:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(231,76,60,0.3);
+    }
+
+    /* ===== EMPTY STATE ===== */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-secondary);
+    }
+
+    .empty-state .icon {
+      font-size: 64px;
+      margin-bottom: 16px;
+      display: block;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .empty-state h3 { font-size: 20px; color: var(--text-primary); margin-bottom: 8px; }
+    .empty-state p { font-size: 14px; }
+
+    /* ===== FOLLOW BUTTON ===== */
+    .follow-btn {
+      padding: 6px 16px;
+      border: none;
+      border-radius: var(--radius-btn);
+      cursor: pointer;
+      font-weight: 600;
+      transition: var(--transition);
+      font-size: 14px;
+    }
+
+    .follow-btn.follow {
+      background: var(--color-accent);
+      color: white;
+    }
+
+    .follow-btn.follow:hover {
+      background: var(--color-accent-hover);
+      transform: scale(1.05);
+    }
+
+    .follow-btn.unfollow {
+      background: var(--color-border);
+      color: var(--text-secondary);
+    }
+
+    .follow-btn.unfollow:hover {
+      background: var(--color-danger);
+      color: white;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 640px) {
+      .sidebar { width: 100%; left: -100%; }
+      .auth-container { padding: 32px 24px; margin: 16px; }
+      .auth-logo { font-size: 30px; }
+      .modal-content { padding: 24px 20px; width: 95%; }
+      .post-form-footer { flex-direction: column; align-items: stretch; }
+      .header-btn span { display: none; }
+      .profile-stats { gap: 15px; }
+      .profile-actions { flex-direction: column; }
+      .profile-actions .btn-primary { width: 100%; }
+      .settings-item { flex-direction: column; align-items: stretch; gap: 12px; }
+      .settings-item input[type="text"],
+      .settings-item input[type="email"] { width: 100%; }
+      .settings-color-options { justify-content: center; }
+      .games-grid { grid-template-columns: repeat(2, 1fr); }
+      .admin-stats { grid-template-columns: repeat(2, 1fr); }
+      .admin-user-item { flex-direction: column; align-items: stretch; }
+      .verify-item { flex-direction: column; align-items: stretch; }
+      .search-container input { width: 80px; }
+      .family-tree .level { flex-direction: column; align-items: center; }
+    }
+
+    @media (min-width: 1024px) {
+      .sidebar { left: 0; width: 260px; box-shadow: none; border-right: 1px solid var(--color-border); }
+      .sidebar-close { display: none; }
+      .overlay { display: none; }
+      .main-content { margin-left: 260px; }
+      .menu-btn { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== PARTICLES ===== -->
+  <div class="particles">
+    <div class="particle"></div><div class="particle"></div><div class="particle"></div>
+    <div class="particle"></div><div class="particle"></div><div class="particle"></div>
+    <div class="particle"></div><div class="particle"></div><div class="particle"></div>
+    <div class="particle"></div>
+  </div>
+
+  <!-- ===== AUTH PAGE ===== -->
+  <div class="auth-page" id="authPage">
+    <div class="auth-container">
+      <div class="auth-logo">✦ Kikwux</div>
+      <div class="auth-subtitle">✨ Твоя соцсеть с валютой</div>
+      <div class="auth-error" id="authError">Ошибка</div>
+
+      <form class="auth-form" id="loginForm">
+        <div class="form-group">
+          <label for="loginEmail">📧 Email</label>
+          <input type="email" id="loginEmail" placeholder="user@kikwux.com" required>
+        </div>
+        <div class="form-group">
+          <label for="loginPassword">🔒 Пароль</label>
+          <input type="password" id="loginPassword" placeholder="••••••••" required minlength="4">
+        </div>
+        <button type="submit" class="btn-primary">🚀 Войти</button>
+        <div class="auth-switch">
+          Нет аккаунта? <a id="switchToRegister">Зарегистрироваться</a>
+        </div>
+      </form>
+
+      <form class="auth-form" id="registerForm" style="display:none;">
+        <div class="form-group">
+          <label for="registerName">👤 Имя</label>
+          <input type="text" id="registerName" placeholder="Ваше имя" required>
+        </div>
+        <div class="form-group">
+          <label for="registerUsername">@ Username</label>
+          <input type="text" id="registerUsername" placeholder="username" required>
+        </div>
+        <div class="form-group">
+          <label for="registerEmail">📧 Email</label>
+          <input type="email" id="registerEmail" placeholder="user@kikwux.com" required>
+        </div>
+        <div class="form-group">
+          <label for="registerPassword">🔒 Пароль</label>
+          <input type="password" id="registerPassword" placeholder="минимум 4 символа" required minlength="4">
+        </div>
+        <div class="form-group">
+          <label for="registerConfirm">✅ Подтвердите пароль</label>
+          <input type="password" id="registerConfirm" placeholder="повторите пароль" required minlength="4">
+        </div>
+        <button type="submit" class="btn-primary">🎉 Зарегистрироваться</button>
+        <div class="auth-switch">
+          Уже есть аккаунт? <a id="switchToLogin">Войти</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">✦ Kikwux</div>
+      <button class="sidebar-close" id="sidebarClose">✕</button>
+    </div>
+
+    <div class="sidebar-user" id="sidebarUser">
+      <div class="sidebar-avatar" id="sidebarAvatar">T</div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name" id="sidebarName">Ты</div>
+        <div class="sidebar-user-email" id="sidebarUsername">@username</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <button class="sidebar-nav-item active" data-page="feed" id="sidebarFeed">
+        <span class="icon">🏠</span> Лента
+      </button>
+      <button class="sidebar-nav-item" data-page="search" id="sidebarSearch">
+        <span class="icon">🔍</span> Поиск людей
+      </button>
+      <button class="sidebar-nav-item" data-page="games" id="sidebarGames">
+        <span class="icon">🎮</span> Игры
+      </button>
+      <button class="sidebar-nav-item" data-page="create" id="sidebarCreatePost">
+        <span class="icon">✏️</span> Создать пост
+      </button>
+      <button class="sidebar-nav-item" data-page="profile" id="sidebarProfile">
+        <span class="icon">👤</span> Профиль
+      </button>
+      <button class="sidebar-nav-item admin-only" data-page="admin" id="sidebarAdmin">
+        <span class="icon">👑</span> Админка
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="sidebar-nav-item" id="sidebarSettings">
+        <span class="icon">⚙️</span> Настройки
+      </button>
+      <button class="sidebar-nav-item" id="sidebarLogout" style="color:var(--color-danger);">
+        <span class="icon">🚪</span> Выйти
+      </button>
+    </div>
+  </aside>
+
+  <!-- ===== OVERLAY ===== -->
+  <div class="overlay" id="overlay"></div>
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <div class="main-content" id="mainContent">
+
+    <!-- ===== HEADER ===== -->
+    <header class="header">
+      <div class="container header-content">
+        <div class="header-left">
+          <button class="menu-btn" id="menuBtn">☰</button>
+          <span class="logo">✦ Kikwux</span>
+        </div>
+        <div class="header-right">
+          <div class="currency-display" id="currencyDisplay">🪙 0</div>
+
+          <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Поиск людей..." oninput="searchUsers()">
+            <button onclick="searchUsers()">🔍</button>
+          </div>
+
+          <button class="header-btn" id="gamesBtn">🎮</button>
+          <button class="header-btn" id="profileBtn">👤</button>
+          <button class="header-btn" id="settingsBtn">⚙️</button>
+          <button class="header-btn admin-btn admin-only" id="adminBtn">👑</button>
+          <button class="header-btn logout-btn" id="logoutBtn">🚪</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- ===== CONTENT ===== -->
+    <main class="container">
+
+      <div id="searchResults" style="display:none;margin-top:16px;"></div>
+
+      <section class="post-form" id="postFormSection">
+        <form id="postForm">
+          <textarea id="postInput" placeholder="Что у тебя нового? ✨ (+10 🪙)" maxlength="500" required></textarea>
+          <div class="post-form-footer">
+            <span class="post-form-stats" id="charCounter">0 / 500</span>
+            <button type="submit" class="btn-primary" id="submitBtn">📤 Опубликовать</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="feed" id="feed"></section>
+    </main>
+  </div>
+
+  <!-- ============================================================
+       MODALS
+  ============================================================ -->
+
+  <!-- PROFILE MODAL -->
+  <div class="modal" id="profileModal">
+    <div class="modal-overlay" id="profileModalOverlay"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="profileModalTitle">👤 Профиль</h2>
+        <button class="modal-close" id="profileModalClose">✕</button>
+      </div>
+      <div class="profile-card" id="profileCard">
+        <div class="profile-avatar-large" id="profileAvatarLarge">T</div>
+        <div class="profile-name" id="profileName">Ты</div>
+        <div class="profile-username" id="profileUsername">@username</div>
+        <div class="profile-email" id="profileEmail">user@kikwux.com</div>
+        <div class="profile-bio" id="profileBio">✨ Добро пожаловать в Kikwux!</div>
+        <div class="profile-stats" id="profileStats">
+          <div class="profile-stat">
+            <span class="profile-stat-number" id="pPostCount">0</span>
+            <span class="profile-stat-label">📝 Постов</span>
+          </div>
+          <div class="profile-stat">
+            <span class="profile-stat-number" id="pLikeCount">0</span>
+            <span class="profile-stat-label">❤️ Лайков</span>
+          </div>
+          <div class="profile-stat">
+            <span class="profile-stat-number" id="pCurrencyCount">0</span>
+            <span class="profile-stat-label">🪙 Валюты</span>
+          </div>
+          <div class="profile-stat">
+            <span class="profile-stat-number" id="pFollowersCount">0</span>
+            <span class="profile-stat-label">👥 Подписчиков</span>
+          </div>
+          <div class="profile-stat">
+            <span class="profile-stat-number" id="pFollowingCount">0</span>
+            <span class="profile-stat-label">📌 Подписок</span>
+          </div>
+        </div>
+        <div id="profileVerified" style="margin:12px 0;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;"></div>
+        <div class="profile-actions" id="profileActions">
+          <button class="btn-primary" id="profileEditBtn">✏️ Редактировать</button>
+          <button class="btn-primary" id="profileSettingsBtn">⚙️ Настройки</button>
+          <button class="follow-btn follow" id="profileFollowBtn" style="display:none;" onclick="toggleFollow()">➕ Подписаться</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETTINGS MODAL -->
+  <div class="modal" id="settingsModal">
+    <div class="modal-overlay" id="settingsModalOverlay"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">⚙️ Настройки</h2>
+        <button class="modal-close" id="settingsModalClose">✕</button>
+      </div>
+
+      <div class="settings-group">
+        <label class="settings-group-label">👤 Профиль</label>
+        <div class="settings-item">
+          <div><div class="settings-item-label">Имя</div><div class="settings-item-desc">Ваше отображаемое имя</div></div>
+          <input type="text" id="usernameInput" value="Ты">
+        </div>
+        <div class="settings-item">
+          <div><div class="settings-item-label">@ Username</div><div class="settings-item-desc">Уникальный идентификатор</div></div>
+          <input type="text" id="usernameHandleInput" value="username">
+        </div>
+        <div class="settings-item">
+          <div><div class="settings-item-label">Email</div><div class="settings-item-desc">Для входа и уведомлений</div></div>
+          <input type="email" id="emailInput" value="user@kikwux.com">
+        </div>
+        <div class="settings-item">
+          <div><div class="settings-item-label">Биография</div><div class="settings-item-desc">Расскажите о себе</div></div>
+          <input type="text" id="bioInput" placeholder="✨ О себе...">
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <label class="settings-group-label">🔗 Ссылка на соцсеть</label>
+        <p style="color:var(--text-secondary);font-size:13px;margin-bottom:10px;">Введите ссылку на ваш профиль в соцсети</p>
+        <div class="verify-item">
+          <span class="icon">🌐</span>
+          <input type="text" id="socialLinkInput" placeholder="https://...">
+          <span class="status" id="socialLinkStatus">⬜</span>
+        </div>
+        <button class="btn-primary" style="width:100%;margin-top:10px;" onclick="saveSocialLink()">💾 Сохранить ссылку</button>
+      </div>
+
+      <div class="settings-group">
+        <label class="settings-group-label">👨‍👩‍👧‍👦 Семейное древо</label>
+        <p style="color:var(--text-secondary);font-size:13px;margin-bottom:10px;">Добавьте членов вашей семьи</p>
+        
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
+          <select id="familyRoleSelect" style="padding:8px 14px;border:2px solid var(--color-border);border-radius:var(--radius-btn);background:var(--bg-input);color:var(--text-primary);flex:1;min-width:120px;">
+            <option value="папа">👨 Папа</option>
+            <option value="мама">👩 Мама</option>
+            <option value="дедушка">👴 Дедушка</option>
+            <option value="бабушка">👵 Бабушка</option>
+            <option value="дядя">🧔 Дядя</option>
+            <option value="тётя">👩‍🦰 Тётя</option>
+            <option value="брат">👦 Брат</option>
+            <option value="сестра">👧 Сестра</option>
+            <option value="сын">👶 Сын</option>
+            <option value="дочь">👶 Дочь</option>
+            <option value="внук">🧒 Внук</option>
+            <option value="внучка">👧 Внучка</option>
+          </select>
+          <input type="text" id="familyMemberName" placeholder="Имя члена семьи" style="flex:1;padding:8px 14px;border:2px solid var(--color-border);border-radius:var(--radius-btn);background:var(--bg-input);color:var(--text-primary);min-width:100px;">
+          <button class="btn-primary" onclick="addFamilyMember()">➕ Добавить</button>
+        </div>
+        
+        <div id="familyTree" class="family-tree">
+          <div style="text-align:center;color:var(--text-secondary);font-size:14px;padding:12px;">Нет членов семьи</div>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <label class="settings-group-label">🎨 Внешний вид</label>
+        <div class="settings-item">
+          <div><div class="settings-item-label">Тёмная тема</div><div class="settings-item-desc">Переключить цветовую схему</div></div>
+          <label class="toggle"><input type="checkbox" id="darkModeToggle"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="settings-item">
+          <div><div class="settings-item-label">Акцентный цвет</div><div class="settings-item-desc">Выберите основной цвет</div></div>
+          <div class="settings-color-options">
+            <div class="color-option active" style="background:#7b68ee;" data-color="#7b68ee"></div>
+            <div class="color-option" style="background:#e74c3c;" data-color="#e74c3c"></div>
+            <div class="color-option" style="background:#2ecc71;" data-color="#2ecc71"></div>
+            <div class="color-option" style="background:#f39c12;" data-color="#f39c12"></div>
+            <div class="color-option" style="background:#3498db;" data-color="#3498db"></div>
+          </div>
+        </div>
+        <div class="settings-item">
+          <div><div class="settings-item-label">Размер шрифта</div><div class="settings-item-desc">Увеличить или уменьшить</div></div>
+          <select class="settings-select" id="fontSizeSelect">
+            <option value="small">Маленький</option>
+            <option value="medium" selected>Средний</option>
+            <option value="large">Большой</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <label class="settings-group-label">🔒 Конфиденциальность</label>
+        <div class="settings-item">
+          <div><div class="settings-item-label">Показывать онлайновый статус</div><div class="settings-item-desc">Кто видит, что вы онлайн</div></div>
+          <label class="toggle"><input type="checkbox" checked id="onlineStatusToggle"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="settings-item">
+          <div><div class="settings-item-label">Закрытый профиль</div><div class="settings-item-desc">Только подписчики видят посты</div></div>
+          <label class="toggle"><input type="checkbox" id="privateProfileToggle"><span class="toggle-slider"></span></label>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <label class="settings-group-label">🛠 Управление</label>
+        <div class="settings-item">
+          <div><div class="settings-item-label">Очистить все посты</div><div class="settings-item-desc">Удалить все ваши публикации</div></div>
+          <button class="btn-danger" id="clearPostsBtn">Очистить</button>
+        </div>
+        <div class="settings-item">
+          <div><div class="settings-item-label">Удалить аккаунт</div><div class="settings-item-desc">Навсегда удалить профиль</div></div>
+          <button class="btn-danger" id="deleteAccountBtn">🗑️ Удалить</button>
+        </div>
+        <div class="settings-item">
+          <div><div class="settings-item-label">Сбросить настройки</div><div class="settings-item-desc">Вернуть все настройки по умолчанию</div></div>
+          <button class="btn-danger" id="resetSettingsBtn">Сбросить</button>
+        </div>
+      </div>
+
+      <div style="margin-top:16px;text-align:center;font-size:13px;color:var(--text-secondary);">
+        ✨ Kikwux v6.0 • Сделано с ❤️
+      </div>
+    </div>
+  </div>
+
+  <!-- GAMES MODAL -->
+  <div class="modal" id="gamesModal">
+    <div class="modal-overlay" id="gamesModalOverlay"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">🎮 Игры</h2>
+        <button class="modal-close" id="gamesModalClose">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="color:var(--text-secondary);margin-bottom:16px;">Играй и зарабатывай валюту! 🪙</p>
+        <div class="games-grid" id="gamesGrid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN MODAL -->
+  <div class="modal" id="adminModal">
+    <div class="modal-overlay" id="adminModalOverlay"></div>
+    <div class="modal-content" style="max-width:650px;">
+      <div class="modal-header">
+        <h2 class="modal-title">👑 Админ-панель</h2>
+        <button class="modal-close" id="adminModalClose">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="admin-stats" id="adminStats">
+          <div class="admin-stat"><div class="number" id="adminPosts">0</div><div class="label">📝 Постов</div></div>
+          <div class="admin-stat"><div class="number" id="adminUsers">0</div><div class="label">👥 Пользователей</div></div>
+          <div class="admin-stat"><div class="number" id="adminOnline">0</div><div class="label">🟢 В сети</div></div>
+          <div class="admin-stat"><div class="number" id="adminCurrency">0</div><div class="label">🪙 Всего валюты</div></div>
+          <div class="admin-stat"><div class="number" id="adminBanned">0</div><div class="label">🚫 Забанено</div></div>
+        </div>
+
+        <h3 style="margin:16px 0 12px;">👥 Управление пользователями</h3>
+        <div id="adminUserList"></div>
+
+        <h3 style="margin:16px 0 12px;">💰 Выдача валюты</h3>
+        <div class="admin-give-form">
+          <input type="text" id="adminGiveEmail" placeholder="Email пользователя">
+          <input type="number" id="adminGiveAmount" placeholder="Сумма" style="width:100px;">
+          <button class="btn-primary" onclick="adminGiveCurrency()">💰 Выдать</button>
+        </div>
+
+        <h3 style="margin:16px 0 12px;">👑 Назначить администратора</h3>
+        <div class="admin-give-form">
+          <input type="text" id="adminMakeAdminEmail" placeholder="Email пользователя">
+          <button class="btn-primary" onclick="adminMakeAdmin()" style="background:linear-gradient(135deg,#e74c3c,#c0392b);">👑 Назначить</button>
+        </div>
+
+        <button class="btn-danger" style="width:100%;margin-top:12px;" onclick="adminClearAll()">🗑️ Очистить всё</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       JAVASCRIPT
+  ============================================================ -->
+  <script>
+    // ============================================================
+    //  ДАННЫЕ
+    // ============================================================
+    const GAMES = [
+      { id: 'clicker', name: 'Кликер', emoji: '🖱️', reward: 1, cooldown: 2 },
+      { id: 'quiz', name: 'Викторина', emoji: '❓', reward: 5, cooldown: 30 },
+      { id: 'spin', name: 'Колесо', emoji: '🎡', reward: 10, cooldown: 60 },
+      { id: 'memory', name: 'Память', emoji: '🧠', reward: 8, cooldown: 45 },
+      { id: 'dice', name: 'Кости', emoji: '🎲', reward: 6, cooldown: 20 },
+      { id: 'cards', name: 'Карты', emoji: '🃏', reward: 7, cooldown: 25 },
+      { id: 'typing', name: 'Скорость', emoji: '⌨️', reward: 4, cooldown: 15 },
+      { id: 'math', name: 'Математика', emoji: '📐', reward: 3, cooldown: 10 },
+      { id: 'reaction', name: 'Реакция', emoji: '⚡', reward: 2, cooldown: 5 },
+      { id: 'lucky', name: 'Удача', emoji: '🍀', reward: 15, cooldown: 120 }
+    ];
+
+    // ============================================================
+    //  СОСТОЯНИЕ
+    // ============================================================
+    let currentUser = null;
+    let users = JSON.parse(localStorage.getItem('kikwux_users')) || [];
+    let posts = JSON.parse(localStorage.getItem('kikwux_posts')) || [];
+    let comments = JSON.parse(localStorage.getItem('kikwux_comments')) || {};
+    let gameCooldowns = JSON.parse(localStorage.getItem('kikwux_cooldowns')) || {};
+    let viewingUser = null;
+
+    // ============================================================
+    //  АВТОРИЗАЦИЯ
+    // ============================================================
+    document.getElementById('loginForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value.trim();
+      
+      const user = users.find(u => u.email === email && u.password === password);
+      if (!user) { showAuthError('Неверный email или пароль'); return; }
+      if (user.banned) { showAuthError('⛔ Вы забанены!'); return; }
+      
+      currentUser = user;
+      localStorage.setItem('kikwux_current_user', JSON.stringify(user));
+      document.getElementById('authPage').style.display = 'none';
+      initApp();
+    });
+
+    document.getElementById('registerForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('registerName').value.trim();
+      const username = document.getElementById('registerUsername').value.trim();
+      const email = document.getElementById('registerEmail').value.trim();
+      const password = document.getElementById('registerPassword').value.trim();
+      const confirm = document.getElementById('registerConfirm').value.trim();
+      
+      if (!name || name.length < 2) { showAuthError('Имя минимум 2 символа'); return; }
+      if (!username || username.length < 2) { showAuthError('Username минимум 2 символа'); return; }
+      if (users.find(u => u.username === username)) { showAuthError('Username уже занят'); return; }
+      if (!email || !email.includes('@')) { showAuthError('Введите корректный email'); return; }
+      if (password.length < 4) { showAuthError('Пароль минимум 4 символа'); return; }
+      if (password !== confirm) { showAuthError('Пароли не совпадают'); return; }
+      if (users.find(u => u.email === email)) { showAuthError('Email уже занят'); return; }
+      
+      const isAdmin = email === 'admin@kikwux.com';
+      
+      const user = {
+        id: Date.now(),
+        name: name,
+        username: username,
+        email: email,
+        password: password,
+        currency: 100,
+        socialLink: '',
+        family: [],
+        followers: [],
+        following: [],
+        banned: false,
+        isAdmin: isAdmin,
+        createdAt: new Date().toISOString(),
+        bio: '✨ Добро пожаловать в Kikwux!'
+      };
+      
+      users.push(user);
+      localStorage.setItem('kikwux_users', JSON.stringify(users));
+      currentUser = user;
+      localStorage.setItem('kikwux_current_user', JSON.stringify(user));
+      document.getElementById('authPage').style.display = 'none';
+      initApp();
+      
+      if (isAdmin) {
+        showNotification('👑 Добро пожаловать, Администратор!', 'success');
+      } else {
+        showNotification('🎉 Добро пожаловать, ' + name + '!', 'success');
+      }
+    });
+
+    function showAuthError(msg) {
+      const el = document.getElementById('authError');
+      el.textContent = msg;
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 4000);
+    }
+
+    document.getElementById('switchToRegister').addEventListener('click', () => {
+      document.getElementById('loginForm').style.display = 'none';
+      document.getElementById('registerForm').style.display = 'block';
+      document.querySelector('.auth-subtitle').textContent = '✨ Создай свой аккаунт';
+    });
+
+    document.getElementById('switchToLogin').addEventListener('click', () => {
+      document.getElementById('loginForm').style.display = 'block';
+      document.getElementById('registerForm').style.display = 'none';
+      document.querySelector('.auth-subtitle').textContent = '✨ Твоя соцсеть с валютой';
+    });
+
+    function logout() {
+      if (!confirm('Выйти из аккаунта?')) return;
+      currentUser = null;
+      localStorage.removeItem('kikwux_current_user');
+      document.getElementById('authPage').style.display = 'flex';
+      document.querySelector('.header').style.display = 'none';
+      document.querySelector('.container').style.display = 'none';
+      document.querySelector('.main-content').classList.remove('active');
+    }
+
+    // ============================================================
+    //  ИНИЦИАЛИЗАЦИЯ
+    // ============================================================
+    function initApp() {
+      document.querySelector('.header').style.display = 'block';
+      document.querySelector('.container').style.display = 'block';
+      document.querySelector('.main-content').classList.add('active');
+      document.getElementById('authPage').style.display = 'none';
+      
+      updateUI();
+      renderPosts();
+      renderGames();
+      updateAdminVisibility();
+      checkForSearchResults();
+    }
+
+    // ============================================================
+    //  ОБНОВЛЕНИЕ UI
+    // ============================================================
+    function updateUI() {
+      if (!currentUser) return;
+      document.getElementById('currencyDisplay').textContent = '🪙 ' + currentUser.currency;
+      
+      document.getElementById('sidebarName').textContent = currentUser.name;
+      document.getElementById('sidebarUsername').textContent = '@' + currentUser.username;
+      document.getElementById('sidebarAvatar').textContent = currentUser.name[0].toUpperCase();
+
+      if (!viewingUser || viewingUser.id === currentUser.id) {
+        updateProfileCard(currentUser);
+      }
+    }
+
+    function updateProfileCard(user) {
+      document.getElementById('profileName').textContent = user.name;
+      document.getElementById('profileUsername').textContent = '@' + user.username;
+      document.getElementById('profileEmail').textContent = user.email;
+      document.getElementById('profileBio').textContent = user.bio || '✨ Добро пожаловать в Kikwux!';
+      document.getElementById('profileAvatarLarge').textContent = user.name[0].toUpperCase();
+
+      const userPosts = posts.filter(p => p.authorId === user.id);
+      document.getElementById('pPostCount').textContent = userPosts.length;
+      const likes = userPosts.reduce((sum, p) => sum + (p.likes || 0), 0);
+      document.getElementById('pLikeCount').textContent = likes;
+      document.getElementById('pCurrencyCount').textContent = user.currency || 0;
+      document.getElementById('pFollowersCount').textContent = (user.followers || []).length;
+      document.getElementById('pFollowingCount').textContent = (user.following || []).length;
+
+      // Ссылка на соцсеть
+      const verifiedDiv = document.getElementById('profileVerified');
+      if (user.socialLink) {
+        verifiedDiv.innerHTML = `
+          <span style="font-weight:600;">🔗 Соцсеть:</span>
+          <a href="${user.socialLink}" target="_blank" style="color:var(--color-accent);text-decoration:none;">${user.socialLink}</a>
+        `;
+      } else {
+        verifiedDiv.innerHTML = `<span style="color:var(--text-secondary);font-size:14px;">🔗 Нет ссылки на соцсеть</span>`;
+      }
+
+      // Кнопка подписки
+      const actions = document.getElementById('profileActions');
+      const followBtn = document.getElementById('profileFollowBtn');
+      
+      if (user.id === currentUser.id) {
+        actions.style.display = 'flex';
+        followBtn.style.display = 'none';
+        document.getElementById('profileModalTitle').textContent = '👤 Мой профиль';
+      } else {
+        actions.style.display = 'flex';
+        followBtn.style.display = 'inline-block';
+        document.getElementById('profileModalTitle').textContent = '👤 Профиль ' + user.name;
+        
+        const isFollowing = currentUser.following && currentUser.following.includes(user.id);
+        followBtn.textContent = isFollowing ? '✅ Подписан' : '➕ Подписаться';
+        followBtn.className = 'follow-btn ' + (isFollowing ? 'unfollow' : 'follow');
+        followBtn.onclick = () => toggleFollow(user.id);
+      }
+    }
+
+    function updateAdminVisibility() {
+      const adminElements = document.querySelectorAll('.admin-only');
+      if (currentUser && currentUser.isAdmin) {
+        adminElements.forEach(el => el.classList.add('visible'));
+      } else {
+        adminElements.forEach(el => el.classList.remove('visible'));
+      }
+    }
+
+    // ============================================================
+    //  ПОДПИСКИ
+    // ============================================================
+    function toggleFollow(userId) {
+      if (!userId) userId = viewingUser.id;
+      if (userId === currentUser.id) return;
+      
+      const targetUser = users.find(u => u.id === userId);
+      if (!targetUser) return;
+      
+      if (!currentUser.following) currentUser.following = [];
+      if (!targetUser.followers) targetUser.followers = [];
+      
+      const index = currentUser.following.indexOf(userId);
+      if (index === -1) {
+        currentUser.following.push(userId);
+        targetUser.followers.push(currentUser.id);
+        showNotification('✅ Вы подписались на ' + targetUser.name, 'success');
+      } else {
+        currentUser.following.splice(index, 1);
+        const followerIndex = targetUser.followers.indexOf(currentUser.id);
+        if (followerIndex !== -1) targetUser.followers.splice(followerIndex, 1);
+        showNotification('❌ Вы отписались от ' + targetUser.name, 'info');
+      }
+      
+      localStorage.setItem('kikwux_users', JSON.stringify(users));
+      updateProfileCard(targetUser);
+      updateUI();
+    }
+
+    // ============================================================
+    //  ПОИСК ЛЮДЕЙ
+    // ============================================================
+    function searchUsers() {
+      const query = document.getElementById('searchInput').value.trim().toLowerCase();
+      const resultsDiv = document.getElementById('searchResults');
+      
+      if (!query) {
+        resultsDiv.style.display = 'none';
+        return;
+      }
+
+      const results = users.filter(u => 
+        u.id !== currentUser.id && 
+        !u.banned &&
+        (u.name.toLowerCase().includes(query) || 
+         u.username.toLowerCase().includes(query) ||
+         u.email.toLowerCase().includes(query))
+      );
+
+      if (results.length === 0) {
+        resultsDiv.innerHTML = `<div style="text-align:center;padding:20px;color:var(--text-secondary);">🔍 Ничего не найдено</div>`;
+        resultsDiv.style.display = 'block';
+        return;
+      }
+
+      resultsDiv.innerHTML = `
+        <h3 style="margin-bottom:12px;">🔍 Результаты поиска (${results.length})</h3>
+        ${results.map(user => {
+          const isFollowing = currentUser.following && currentUser.following.includes(user.id);
+          return `
+          <div class="search-result-item">
+            <div class="avatar" onclick="viewUserProfile(${user.id})">${user.name[0].toUpperCase()}</div>
+            <div class="info" onclick="viewUserProfile(${user.id})">
+              <div class="name">${user.name}</div>
+              <div class="username">@${user.username}</div>
+            </div>
+            <div>
+              <span class="badge">🪙 ${user.currency}</span>
+              ${user.isAdmin ? '<span class="badge badge-admin">👑</span>' : ''}
+              <button class="follow-btn ${isFollowing ? 'unfollow' : 'follow'}" onclick="toggleFollow(${user.id})" style="margin-left:8px;">
+                ${isFollowing ? '✅' : '➕'}
+              </button>
+            </div>
+          </div>
+        `}).join('')}
+      `;
+      resultsDiv.style.display = 'block';
+    }
+
+    function checkForSearchResults() {
+      const query = document.getElementById('searchInput').value.trim();
+      if (query) searchUsers();
+    }
+
+    // ============================================================
+    //  ПРОСМОТР ПРОФИЛЯ
+    // ============================================================
+    function viewUserProfile(userId) {
+      const user = users.find(u => u.id === userId);
+      if (!user) return;
+      
+      viewingUser = user;
+      updateProfileCard(user);
+      document.getElementById('profileModal').classList.add('active');
+      document.getElementById('profileModal').style.display = 'flex';
+      document.getElementById('searchResults').style.display = 'none';
+    }
+
+    function viewProfile() {
+      viewingUser = currentUser;
+      updateProfileCard(currentUser);
+      document.getElementById('profileModal').classList.add('active');
+      document.getElementById('profileModal').style.display = 'flex';
+    }
+
+    // ============================================================
+    //  ПОСТЫ И КОММЕНТАРИИ
+    // ============================================================
+    document.getElementById('postForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      createPost();
+    });
+
+    function createPost() {
+      const text = document.getElementById('postInput').value.trim();
+      if (!text) { showNotification('Напишите что-нибудь!', 'warning'); return; }
+      
+      const post = {
+        id: Date.now(),
+        author: currentUser.name,
+        authorId: currentUser.id,
+        authorUsername: currentUser.username,
+        text: text,
+        time: 'Только что',
+        timestamp: Date.now(),
+        likes: 0,
+        likedBy: [],
+        comments: []
+      };
+      
+      posts.unshift(post);
+      localStorage.setItem('kikwux_posts', JSON.stringify(posts));
+      
+      currentUser.currency += 10;
+      saveUser();
+      
+      document.getElementById('postInput').value = '';
+      document.getElementById('charCounter').textContent = '0 / 500';
+      renderPosts();
+      updateUI();
+      showNotification('✅ Пост опубликован! +10 🪙', 'success');
+    }
+
+    function renderPosts() {
+      const feed = document.getElementById('feed');
+      if (posts.length === 0) {
+        feed.innerHTML = `<div class="empty-state"><span class="icon">📝</span><h3>Нет постов</h3><p>Напишите свой первый пост! ✨</p></div>`;
+        return;
+      }
+      
+      feed.innerHTML = posts.map(post => {
+        const isLiked = post.likedBy && post.likedBy.includes(currentUser.id);
+        const commentCount = (post.comments || []).length;
+        
+        return `
+          <div class="post" id="post-${post.id}">
+            <div class="post-header" onclick="viewUserProfile(${post.authorId})">
+              <div class="post-avatar">${post.author[0].toUpperCase()}</div>
+              <div>
+                <div class="post-author">${post.author} <span class="username">@${post.authorUsername}</span></div>
+                <div class="post-time">${post.time}</div>
+              </div>
+            </div>
+            <div class="post-text">${post.text}</div>
+            <div class="post-actions">
+              <button class="action-btn ${isLiked ? 'liked' : ''}" onclick="likePost(${post.id})">
+                ${isLiked ? '❤️' : '🤍'} <span class="count">${post.likes}</span>
+              </button>
+              <button class="action-btn" onclick="toggleComments(${post.id})">
+                💬 <span class="count">${commentCount}</span>
+              </button>
+              ${post.authorId === currentUser.id ? `<button class="action-btn" onclick="deletePost(${post.id})" style="color:var(--color-danger);">🗑️</button>` : ''}
+            </div>
+            <div class="comments-section" id="comments-${post.id}" style="display:none;">
+              <div id="comments-list-${post.id}">
+                ${renderComments(post.id)}
+              </div>
+              <div class="comment-form">
+                <input type="text" id="comment-input-${post.id}" placeholder="Написать комментарий..." onkeypress="if(event.key==='Enter') addComment(${post.id})">
+                <button onclick="addComment(${post.id})">Отправить</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderComments(postId) {
+      const post = posts.find(p => p.id === postId);
+      if (!post || !post.comments || post.comments.length === 0) {
+        return '<div style="color:var(--text-secondary);font-size:13px;padding:8px 0;">Нет комментариев</div>';
+      }
+      
+      return post.comments.map(comment => `
+        <div class="comment">
+          <div class="comment-avatar" onclick="viewUserProfile(${comment.authorId})">${comment.author[0].toUpperCase()}</div>
+          <div class="comment-content">
+            <div class="comment-author" onclick="viewUserProfile(${comment.authorId})">${comment.author} <span style="font-weight:400;color:var(--text-secondary);font-size:12px;">@${comment.authorUsername}</span></div>
+            <div class="comment-text">${comment.text}</div>
+            <div class="comment-time">${comment.time}</div>
+          </div>
+          ${comment.authorId === currentUser.id ? `<button onclick="deleteComment(${postId}, ${comment.id})" style="background:none;border:none;color:var(--color-danger);cursor:pointer;">✕</button>` : ''}
+        </div>
+      `).join('');
+    }
+
+    function toggleComments(postId) {
+      const section = document.getElementById('comments-' + postId);
+      if (section.style.display === 'none') {
+        section.style.display = 'block';
+      } else {
+        section.style.display = 'none';
+      }
+    }
+
+    function addComment(postId) {
+      const input = document.getElementById('comment-input-' + postId);
+      const text = input.value.trim();
+      if (!text) { showNotification('Напишите комментарий!', 'warning'); return; }
+      
+      const post = posts.find(p => p.id === postId);
+      if (!post) return;
+      
+      if (!post.comments) post.comments = [];
+      
+      const comment = {
+        id: Date.now(),
+        author: currentUser.name,
+        authorId: currentUser.id,
+        authorUsername: currentUser.username,
+        text: text,
+        time: 'Только что',
+        timestamp: Date.now()
+      };
+      
+      post.comments.push(comment);
+      localStorage.setItem('kikwux_posts', JSON.stringify(posts));
+      
+      input.value = '';
+      renderPosts();
+      document.getElementById('comments-' + postId).style.display = 'block';
+      showNotification('💬 Комментарий добавлен!', 'success');
+    }
+
+    function deleteComment(postId, commentId) {
+      if (!confirm('Удалить комментарий?')) return;
+      const post = posts.find(p => p.id === postId);
+      if (!post) return;
+      
+      post.comments = post.comments.filter(c => c.id !== commentId);
+      localStorage.setItem('kikwux_posts', JSON.stringify(posts));
+      renderPosts();
+      showNotification('🗑️ Комментарий удалён', 'info');
+    }
+
+    function likePost(postId) {
+      const post = posts.find(p => p.id === postId);
+      if (!post) return;
+      
+      if (!post.likedBy) post.likedBy = [];
+      
+      if (post.likedBy.includes(currentUser.id)) {
+        post.likes--;
+        post.likedBy = post.likedBy.filter(id => id !== currentUser.id);
+      } else {
+        post.likes++;
+        post.likedBy.push(currentUser.id);
+        currentUser.currency += 1;
+        saveUser();
+        updateUI();
+      }
+      
+      localStorage.setItem('kikwux_posts', JSON.stringify(posts));
+      renderPosts();
+    }
+
+    function deletePost(postId) {
+      if (!confirm('Удалить пост?')) return;
+      posts = posts.filter(p => p.id !== postId);
+      localStorage.setItem('kikwux_posts', JSON.stringify(posts));
+      renderPosts();
+      showNotification('🗑️ Пост удалён', 'info');
+    }
+
+    // ============================================================
+    //  ИГРЫ
+    // ============================================================
+    function openGames() {
+      document.getElementById('gamesModal').classList.add('active');
+      document.getElementById('gamesModal').style.display = 'flex';
+      renderGames();
+    }
+
+    function renderGames() {
+      const grid = document.getElementById('gamesGrid');
+      grid.innerHTML = GAMES.map(game => {
+        const cooldownKey = game.id + '_' + currentUser.id;
+        const lastPlay = gameCooldowns[cooldownKey] || 0;
+        const canPlay = Date.now() - lastPlay >= game.cooldown * 1000;
+        const remaining = Math.ceil((game.cooldown * 1000 - (Date.now() - lastPlay)) / 1000);
+        
+        return `
+          <div class="game-card ${canPlay ? '' : 'locked'}" onclick="${canPlay ? `playGame('${game.id}')` : ''}">
+            <span class="emoji">${game.emoji}</span>
+            <div class="name">${game.name}</div>
+            <div class="reward">+${game.reward} 🪙</div>
+            <div class="cooldown">${canPlay ? '✅ Готово' : '⏳ ' + remaining + 'с'}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function playGame(gameId) {
+      const game = GAMES.find(g => g.id === gameId);
+      if (!game) return;
+      
+      const cooldownKey = game.id + '_' + currentUser.id;
+      const lastPlay = gameCooldowns[cooldownKey] || 0;
+      
+      if (Date.now() - lastPlay < game.cooldown * 1000) {
+        showNotification('⏳ Подождите ' + Math.ceil((game.cooldown * 1000 - (Date.now() - lastPlay)) / 1000) + ' секунд', 'warning');
+        return;
+      }
+      
+      let reward = game.reward;
+      let message = '';
+      
+      switch(game.id) {
+        case 'clicker':
+          reward = Math.floor(Math.random() * 3) + 1;
+          message = '🖱️ Кликнул! +' + reward + ' 🪙';
+          break;
+        case 'quiz':
+          const questions = ['2+2=4?', 'Земля круглая?', 'Python - язык программирования?'];
+          const answer = confirm('❓ ' + questions[Math.floor(Math.random() * questions.length)]);
+          if (!answer) { showNotification('❌ Неправильно!', 'error'); return; }
+          message = '✅ Правильно! +' + reward + ' 🪙';
+          break;
+        case 'spin':
+          const spins = ['🎉', '⭐', '💎', '🍀', '🎰'];
+          const result = spins[Math.floor(Math.random() * spins.length)];
+          reward = game.reward + Math.floor(Math.random() * 5);
+          message = result + ' Выиграл ' + reward + ' 🪙';
+          break;
+        case 'memory':
+          message = '🧠 Нашёл пару! +' + reward + ' 🪙';
+          break;
+        case 'dice':
+          const dice = Math.floor(Math.random() * 6) + 1;
+          reward = dice;
+          message = '🎲 Выпало ' + dice + '! +' + reward + ' 🪙';
+          break;
+        case 'cards':
+          const cards = ['♠️', '♥️', '♦️', '♣️'];
+          const card = cards[Math.floor(Math.random() * cards.length)];
+          message = '🃏 ' + card + '! +' + reward + ' 🪙';
+          break;
+        case 'typing':
+          const words = ['кот', 'дом', 'мир', 'друг', 'сон'];
+          const word = words[Math.floor(Math.random() * words.length)];
+          const typed = prompt('⌨️ Напечатай: ' + word);
+          if (typed !== word) { showNotification('❌ Ошибка!', 'error'); return; }
+          message = '✅ Быстро! +' + reward + ' 🪙';
+          break;
+        case 'math':
+          const num1 = Math.floor(Math.random() * 10) + 1;
+          const num2 = Math.floor(Math.random() * 10) + 1;
+          const answer2 = prompt('📐 ' + num1 + ' + ' + num2 + ' = ?');
+          if (parseInt(answer2) !== num1 + num2) { showNotification('❌ Неправильно!', 'error'); return; }
+          message = '✅ Молодец! +' + reward + ' 🪙';
+          break;
+        case 'reaction':
+          const start = Date.now();
+          alert('⚡ Нажми ОК как можно быстрее!');
+          const time = (Date.now() - start) / 1000;
+          if (time > 2) { showNotification('⏳ Слишком медленно!', 'warning'); return; }
+          reward = game.reward + Math.floor((2 - time) * 2);
+          message = '⚡ Реакция ' + time.toFixed(2) + 'с! +' + reward + ' 🪙';
+          break;
+        case 'lucky':
+          const lucky = Math.random();
+          if (lucky < 0.3) {
+            reward = game.reward * 2;
+            message = '🍀 Удача улыбнулась! +' + reward + ' 🪙';
+          } else if (lucky < 0.6) {
+            reward = game.reward;
+            message = '🍀 Неплохо! +' + reward + ' 🪙';
+          } else {
+            reward = 0;
+            message = '😅 В следующий раз повезёт!';
+          }
+          break;
+        default:
+          message = '🎮 Игра завершена! +' + reward + ' 🪙';
+      }
+      
+      gameCooldowns[cooldownKey] = Date.now();
+      localStorage.setItem('kikwux_cooldowns', JSON.stringify(gameCooldowns));
+      
+      if (reward > 0) {
+        currentUser.currency += reward;
+        saveUser();
+        updateUI();
+        showNotification(message, 'success');
+      } else {
+        showNotification(message, 'warning');
+      }
+      
+      renderGames();
+    }
+
+    // ============================================================
+    //  СОЦИАЛЬНАЯ ССЫЛКА
+    // ============================================================
+    function saveSocialLink() {
+      const link = document.getElementById('socialLinkInput').value.trim();
+      currentUser.socialLink = link;
+      saveUser();
+      updateUI();
+      
+      const status = document.getElementById('socialLinkStatus');
+      status.textContent = link ? '✅' : '⬜';
+      
+      showNotification(link ? '✅ Ссылка сохранена!' : '⬜ Ссылка удалена', link ? 'success' : 'info');
+    }
+
+    // ============================================================
+    //  СЕМЬЯ
+    // ============================================================
+    function renderFamilyTree() {
+      const container = document.getElementById('familyTree');
+      const family = currentUser.family || [];
+      
+      if (family.length === 0) {
+        container.innerHTML = '<div style="text-align:center;color:var(--text-secondary);font-size:14px;padding:12px;">Нет членов семьи</div>';
+        return;
+      }
+      
+      // Группируем по ролям
+      const roles = {
+        'папа': '👨',
+        'мама': '👩',
+        'дедушка': '👴',
+        'бабушка': '👵',
+        'дядя': '🧔',
+        'тётя': '👩‍🦰',
+        'брат': '👦',
+        'сестра': '👧',
+        'сын': '👶',
+        'дочь': '👶',
+        'внук': '🧒',
+        'внучка': '👧'
+      };
+      
+      let html = '<div class="level">';
+      family.forEach(member => {
+        const emoji = roles[member.role] || '👤';
+        html += `
+          <div class="member">
+            <span class="emoji">${emoji}</span>
+            <span class="name">${member.name}</span>
+            <span style="font-size:12px;color:var(--text-secondary);">${member.role}</span>
+            <button onclick="removeFamilyMember('${member.id}')" style="background:none;border:none;color:var(--color-danger);cursor:pointer;font-size:16px;">✕</button>
+          </div>
+        `;
+      });
+      html += '</div>';
+      
+      container.innerHTML = html;
+    }
+
+    function addFamilyMember() {
+      const role = document.getElementById('familyRoleSelect').value;
+      const name = document.getElementById('familyMemberName').value.trim();
+      
+      if (!name) { showNotification('Введите имя члена семьи', 'warning'); return; }
+      
+      if (!currentUser.family) currentUser.family = [];
+      
+      const member = {
+        id: Date.now() + Math.random(),
+        role: role,
+        name: name
+      };
+      
+      currentUser.family.push(member);
+      saveUser();
+      renderFamilyTree();
+      document.getElementById('familyMemberName').value = '';
+      showNotification('👨‍👩‍👧‍👦 ' + name + ' добавлен в семью!', 'success');
+    }
+
+    function removeFamilyMember(id) {
+      if (!confirm('Удалить члена семьи?')) return;
+      currentUser.family = currentUser.family.filter(m => m.id !== id);
+      saveUser();
+      renderFamilyTree();
+      showNotification('🗑️ Удалён из семьи', 'info');
+    }
+
+    // ============================================================
+    //  УДАЛЕНИЕ АККАУНТА И ПОСТОВ
+    // ============================================================
+    function deleteAccount() {
+      if (!confirm('Удалить аккаунт навсегда?')) return;
+      if (!confirm('Это действие необратимо! Вы уверены?')) return;
+      
+      users = users.filter(u => u.id !== currentUser.id);
+      posts = posts.filter(p => p.authorId !== currentUser.id);
+      localStorage.setItem('kikwux_users', JSON.stringify(users));
+      localStorage.setItem('kikwux_posts', JSON.stringify(posts));
+      
+      currentUser = null;
+      localStorage.removeItem('kikwux_current_user');
+      document.getElementById('authPage').style.display = 'flex';
+      document.querySelector('.header').style.display = 'none';
+      document.querySelector('.container').style.display = 'none';
+      document.querySelector('.main-content').classList.remove('active');
+      showNotification('🗑️ Аккаунт удалён', 'error');
+    }
+
+    function clearAllPosts() {
+      if (!confirm('Удалить все ваши посты?')) return;
+      posts = posts.filter(p => p.authorId !== currentUser.id);
+      localStorage.setItem('kikwux_posts', JSON.stringify(posts));
+      renderPosts();
+      showNotification('🧹 Все посты очищены', 'info');
+    }
+
+    // ============================================================
+    //  АДМИНКА
+    // ============================================================
+    function openAdmin() {
+      if (!currentUser || !currentUser.isAdmin) {
+        showNotification('⛔ Доступ запрещён', 'error');
+        return;
+      }
+      
+      updateAdminStats();
+      renderAdminUsers();
+      document.getElementById('adminModal').classList.add('active');
+      document.getElementById('adminModal').style.display = 'flex';
+    }
+
+    function updateAdminStats() {
+      document.getElementById('adminPosts').textContent = posts.length;
+      document.getElementById('adminUsers').textContent = users.length;
+      document.getElementById('adminOnline').textContent = Math.floor(Math.random() * 10) + 1;
+      document.getElementById('adminCurrency').textContent = users.reduce((sum, u) => sum + (u.currency || 0), 0);
+      document.getElementById('adminBanned').textContent = users.filter(u => u.banned).length;
+    }
+
+    function renderAdminUsers() {
+      const list = document.getElementById('adminUserList');
+      list.innerHTML = users.map(user => {
+        return `
+          <div class="admin-user-item">
+            <div>
+              <strong>${user.name}</strong>
+              <span style="color:var(--text-secondary);font-size:13px;">@${user.username}</span>
+              <span style="color:var(--text-secondary);font-size:13px;">${user.email}</span>
+              ${user.banned ? ' <span class="badge badge-banned">🚫 Бан</span>' : ''}
+              ${user.isAdmin ? ' <span class="badge badge-admin">👑 Админ</span>' : ''}
+              <span style="font-size:13px;">🪙 ${user.currency}</span>
+              ${user.socialLink ? ' <span class="badge badge-verified">🔗</span>' : ''}
+            </div>
+            <div>
+              <button class="btn-currency" onclick="adminGiveUserCurrency('${user.email}', 10)">💰 +10</button>
+              ${user.banned ? 
+                `<button class="btn-unban" onclick="adminUnbanUser('${user.email}')">✅ Разбан</button>` :
+                `<button class="btn-ban" onclick="adminBanUser('${user.email}')">🔨 Бан</button>`
+              }
+              ${!user.isAdmin ? `<button class="btn-admin" onclick="adminMakeAdminUser('${user.email}')">👑</button>` : ''}
+              <button onclick="adminDeleteUser('${user.email}')" style="background:var(--color-danger);color:white;padding:4px 12px;border:none;border-radius:6px;cursor:pointer;">🗑️</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function adminBanUser(email) {
+      const user = users.find(u => u.email === email);
+      if (!user) return;
+      if (user.isAdmin) { showNotification('❌ Нельзя забанить админа', 'error'); return; }
+      user.banned = true;
+      localStorage.setItem('kikwux_users', JSON.stringify(users));
+      renderAdminUsers();
+      updateAdminStats();
+      showNotification('🔨 ' + user.name + ' забанен', 'error');
+    }
+
+    function adminUnbanUser(email) {
+      const user = users.find(u => u.email === email);
+      if (!user) return;
+      user.banned = false;
+      localStorage.setItem('kikwux_users', JSON.stringify(users));
+      renderAdminUsers();
+      updateAdminStats();
+      showNotification('✅ ' + user.name + ' разбанен', 'success');
+    }
+
+    function adminDeleteUser(email) {
+      if (!confirm('Удалить пользователя ' + email + '?')) return;
+      const user = users.find(u => u.email === email);
+      if (user && user.isAdmin && users.filter(u => u.isAdmin).length <= 1) {
+        showNotification('❌ Нельзя удалить последнего админа', 'error');
+        return;
+      }
+      users = users.filter(u => u.email !== email);
+      posts = posts.filter(p => p.authorId !== user?.id);
+      localStorage.setItem('kikwux_users', JSON.stringify(users));
+      localStorage.setItem('kikwux_posts', JSON.stringify(posts));
+      renderAdminUsers();
+      updateAdminStats();
+      showNotification('🗑️ Пользователь удалён', 'info');
+    }
+
+    function adminGiveUserCurrency(email, amount) {
+      const user = users.find(u => u.email === email);
+      if (!user) return;
+      user.currency += amount;
+      localStorage.setItem('kikwux_users', JSON.stringify(users));
+      renderAdminUsers();
+      updateAdminStats();
+      showNotification('💰 ' + user.name + ' получил ' + amount + ' 🪙', 'success');
+    }
+
+    function adminGiveCurrency() {
+      const email = document.getElementById('adminGiveEmail').value.trim();
+      const amount = parseInt(document.getElementById('adminGiveAmount').value);
+      
+      if (!email) { showNotification('Введите email', 'warning'); return; }
+      if (!amount || amount <= 0) { showNotification('Введите сумму', 'warning'); return; }
+      
+      const user = users.find(u => u.email === email);
+      if (!user) { showNotification('Пользователь не найден', 'error'); return; }
+      
+      user.currency += amount;
+      localStorage.setItem('kikwux_users', JSON.stringify(users));
+      document.getElementById('adminGiveEmail').value = '';
+      document.getElementById('adminGiveAmount').value = '';
+      updateAdminStats();
+      renderAdminUsers();
+      showNotification('💰 ' + user.name + ' получил ' + amount + ' 🪙', 'success');
+    }
+
+    function adminMakeAdmin() {
+      const email = document.getElementById('adminMakeAdminEmail').value.trim();
+      if (!email) { showNotification('Введите email', 'warning'); return; }
+      
+      const user = users.find(u => u.email === email);
+      if (!user) { showNotification('Пользователь не найден', 'error'); return; }
+      
+      if (user.isAdmin) { showNotification('Уже администратор', 'warning'); return; }
+      
+      user.isAdmin = true;
+      localStorage.setItem('kikwux_users', JSON.stringify(users));
+      document.getElementById('adminMakeAdminEmail').value = '';
+      renderAdminUsers();
+      updateAdminStats();
+      showNotification('👑 ' + user.name + ' назначен администратором!', 'success');
+    }
+
+    function adminMakeAdminUser(email) {
+      const user = users.find(u => u.email === email);
+      if (!user) return;
+      if (user.isAdmin) return;
+      
+      user.isAdmin = true;
+      localStorage.setItem('kikwux_users', JSON.stringify(users));
+      renderAdminUsers();
+      updateAdminStats();
+      showNotification('👑 ' + user.name + ' назначен администратором!', 'success');
+    }
+
+    function adminClearAll() {
+      if (!confirm('Очистить всё? (посты, пользователей, кроме админов)')) return;
+      
+      const admins = users.filter(u => u.isAdmin);
+      users = admins;
+      posts = [];
+      
+      localStorage.setItem('kikwux_users', JSON.stringify(users));
+      localStorage.setItem('kikwux_posts', JSON.stringify(posts));
+      
+      updateAdminStats();
+      renderAdminUsers();
+      showNotification('🧹 Всё очищено', 'info');
+    }
+
+    // ============================================================
+    //  ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+    // ============================================================
+    function saveUser() {
+      const index = users.findIndex(u => u.id === currentUser.id);
+      if (index !== -1) {
+        users[index] = currentUser;
+        localStorage.setItem('kikwux_users', JSON.stringify(users));
+        localStorage.setItem('kikwux_current_user', JSON.stringify(currentUser));
+      }
+      updateUI();
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('active');
+      document.getElementById(id).style.display = 'none';
+      document.body.style.overflow = '';
+    }
+
+    function showNotification(msg, type = 'info') {
+      const div = document.createElement('div');
+      div.className = 'notification ' + type;
+      div.textContent = msg;
+      document.body.appendChild(div);
+      setTimeout(() => {
+        div.style.opacity = '0';
+        div.style.transition = 'opacity 0.4s';
+        setTimeout(() => div.remove(), 400);
+      }, 2500);
+    }
+
+    // ============================================================
+    //  UI CONTROLS
+    // ============================================================
+    function setupUI() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('overlay');
+      const menuBtn = document.getElementById('menuBtn');
+      const sidebarClose = document.getElementById('sidebarClose');
+      const profileBtn = document.getElementById('profileBtn');
+      const sidebarProfile = document.getElementById('sidebarProfile');
+      const gamesBtn = document.getElementById('gamesBtn');
+      const sidebarGames = document.getElementById('sidebarGames');
+      const settingsBtn = document.getElementById('settingsBtn');
+      const sidebarSettings = document.getElementById('sidebarSettings');
+      const sidebarCreatePost = document.getElementById('sidebarCreatePost');
+      const logoutBtn = document.getElementById('logoutBtn');
+      const sidebarLogout = document.getElementById('sidebarLogout');
+      const adminBtn = document.getElementById('adminBtn');
+      const sidebarAdmin = document.getElementById('sidebarAdmin');
+      const settingsModal = document.getElementById('settingsModal');
+      const settingsModalOverlay = document.getElementById('settingsModalOverlay');
+      const settingsModalClose = document.getElementById('settingsModalClose');
+      const profileModal = document.getElementById('profileModal');
+      const profileModalOverlay = document.getElementById('profileModalOverlay');
+      const profileModalClose = document.getElementById('profileModalClose');
+      const gamesModal = document.getElementById('gamesModal');
+      const gamesModalOverlay = document.getElementById('gamesModalOverlay');
+      const gamesModalClose = document.getElementById('gamesModalClose');
+      const adminModal = document.getElementById('adminModal');
+      const adminModalOverlay = document.getElementById('adminModalOverlay');
+      const adminModalClose = document.getElementById('adminModalClose');
+      const profileEditBtn = document.getElementById('profileEditBtn');
+      const profileSettingsBtn = document.getElementById('profileSettingsBtn');
+      const postFormSection = document.getElementById('postFormSection');
+      const deleteAccountBtn = document.getElementById('deleteAccountBtn');
+      const clearPostsBtn = document.getElementById('clearPostsBtn');
+      const sidebarSearch = document.getElementById('sidebarSearch');
+
+      function toggleSidebar() {
+        sidebar.classList.toggle('active');
+        overlay.classList.toggle('active');
+        document.body.style.overflow = sidebar.classList.contains('active') ? 'hidden' : '';
+      }
+
+      function openModal(modal) {
+        modal.classList.add('active');
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+      }
+
+      menuBtn.addEventListener('click', toggleSidebar);
+      sidebarClose.addEventListener('click', () => {
+        sidebar.classList.remove('active');
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+      });
+      overlay.addEventListener('click', () => {
+        sidebar.classList.remove('active');
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+      });
+
+      profileBtn.addEventListener('click', () => { viewProfile(); closeSidebar(); });
+      sidebarProfile.addEventListener('click', () => { viewProfile(); closeSidebar(); });
+      profileModalOverlay.addEventListener('click', () => closeModal('profileModal'));
+      profileModalClose.addEventListener('click', () => closeModal('profileModal'));
+
+      gamesBtn.addEventListener('click', () => { openGames(); closeSidebar(); });
+      sidebarGames.addEventListener('click', () => { openGames(); closeSidebar(); });
+      gamesModalOverlay.addEventListener('click', () => closeModal('gamesModal'));
+      gamesModalClose.addEventListener('click', () => closeModal('gamesModal'));
+
+      settingsBtn.addEventListener('click', () => { 
+        closeSidebar(); 
+        openModal(settingsModal); 
+        loadSettingsData(); 
+      });
+      sidebarSettings.addEventListener('click', () => { 
+        closeSidebar(); 
+        openModal(settingsModal); 
+        loadSettingsData(); 
+      });
+      settingsModalOverlay.addEventListener('click', () => closeModal('settingsModal'));
+      settingsModalClose.addEventListener('click', () => closeModal('settingsModal'));
+
+      adminBtn.addEventListener('click', () => { closeSidebar(); openAdmin(); });
+      sidebarAdmin.addEventListener('click', () => { closeSidebar(); openAdmin(); });
+      adminModalOverlay.addEventListener('click', () => closeModal('adminModal'));
+      adminModalClose.addEventListener('click', () => closeModal('adminModal'));
+
+      profileEditBtn.addEventListener('click', () => { 
+        closeModal('profileModal'); 
+        openModal(settingsModal); 
+        loadSettingsData(); 
+      });
+      profileSettingsBtn.addEventListener('click', () => { 
+        closeModal('profileModal'); 
+        openModal(settingsModal); 
+        loadSettingsData(); 
+      });
+
+      logoutBtn.addEventListener('click', logout);
+      sidebarLogout.addEventListener('click', logout);
+
+      deleteAccountBtn.addEventListener('click', deleteAccount);
+      clearPostsBtn.addEventListener('click', clearAllPosts);
+
+      sidebarCreatePost.addEventListener('click', () => {
+        closeSidebar();
+        postFormSection.scrollIntoView({ behavior: 'smooth' });
+        document.getElementById('postInput').focus();
+      });
+
+      sidebarSearch.addEventListener('click', () => {
+        closeSidebar();
+        document.getElementById('searchInput').focus();
+        document.getElementById('searchInput').scrollIntoView({ behavior: 'smooth' });
+      });
+
+      document.getElementById('sidebarUser').addEventListener('click', () => {
+        viewProfile();
+        if (window.innerWidth < 1024) closeSidebar();
+      });
+
+      document.getElementById('sidebarFeed').addEventListener('click', () => {
+        if (window.innerWidth < 1024) closeSidebar();
+        document.getElementById('searchResults').style.display = 'none';
+        document.getElementById('searchInput').value = '';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          closeModal('settingsModal');
+          closeModal('profileModal');
+          closeModal('gamesModal');
+          closeModal('adminModal');
+          closeSidebar();
+        }
+      });
+
+      window.addEventListener('resize', () => {
+        if (window.innerWidth >= 1024) {
+          sidebar.classList.remove('active');
+          overlay.classList.remove('active');
+          document.body.style.overflow = '';
+        }
+      });
+
+      function loadSettingsData() {
+        if (currentUser) {
+          document.getElementById('usernameInput').value = currentUser.name;
+          document.getElementById('usernameHandleInput').value = currentUser.username || '';
+          document.getElementById('emailInput').value = currentUser.email;
+          document.getElementById('bioInput').value = currentUser.bio || '';
+          document.getElementById('socialLinkInput').value = currentUser.socialLink || '';
+          
+          const status = document.getElementById('socialLinkStatus');
+          status.textContent = currentUser.socialLink ? '✅' : '⬜';
+          
+          renderFamilyTree();
+        }
+      }
+
+      function closeSidebar() {
+        sidebar.classList.remove('active');
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+    }
+
+    // ============================================================
+    //  ИНИЦИАЛИЗАЦИЯ
+    // ============================================================
+    document.addEventListener('DOMContentLoaded', () => {
+      const saved = localStorage.getItem('kikwux_current_user');
+      if (saved) {
+        currentUser = JSON.parse(saved);
+        if (currentUser) {
+          document.getElementById('authPage').style.display = 'none';
+          initApp();
+        }
+      }
+      
+      if (!currentUser) {
+        document.getElementById('authPage').style.display = 'flex';
+        document.querySelector('.header').style.display = 'none';
+        document.querySelector('.container').style.display = 'none';
+      }
+      
+      setupUI();
+      updateUI();
+      
+      document.getElementById('postInput').addEventListener('input', function() {
+        const len = this.value.length;
+        const max = 500;
+        document.getElementById('charCounter').textContent = len + ' / ' + max;
+        document.getElementById('charCounter').classList.toggle('warning', len > max * 0.8);
+        document.getElementById('submitBtn').disabled = len === 0;
+      });
+      
+      console.log('🚀 Kikwux v6.0 запущен!');
+      console.log('👑 Админ: admin@kikwux.com (пароль при регистрации)');
+      console.log('💬 Добавлены подписки и семейное древо!');
+      console.log('@ Username вместо email в профиле!');
+    });
+  </script>
+</body>
+</html>
